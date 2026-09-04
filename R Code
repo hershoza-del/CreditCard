@@ -6,7 +6,6 @@ dim(df)
 str(df)        
 glimpse(df)      
 
-
 head(df, 5)     
 tail(df, 5) 
 
