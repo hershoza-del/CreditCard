@@ -1,0 +1,50 @@
+df$is_fraud <- factor(df$is_fraud, levels = c(0,1), labels = c("Not Fraud","Fraud"))
+
+ggplot(df, aes(x = is_fraud, y = velocity_score, fill = is_fraud)) +
+  geom_boxplot() +
+  labs(title = "Velocity Score by Fraud Status",
+       x = "Fraud Status", y = "Velocity Score") +
+  theme_minimal()
+
+ggplot(df, aes(x = is_fraud, y = merchant_risk_score, fill = is_fraud)) +
+  geom_boxplot() +
+  labs(title = "Merchant Risk Score by Fraud Status",
+       x = "Fraud Status", y = "Merchant Risk Score") +
+  theme_minimal()
+
+flags_summary <- df %>%
+  group_by(is_fraud) %>%
+  summarise(
+    is_new_merchant = mean(is_new_merchant) * 100,
+    ip_country_mismatch = mean(ip_country_mismatch) * 100,
+    used_vpn = mean(used_vpn) * 100,
+    billing_shipping_mismatch = mean(billing_shipping_mismatch) * 100,
+    is_foreign_transaction = mean(is_foreign_transaction) * 100
+  ) %>%
+  pivot_longer(-is_fraud, names_to = "flag", values_to = "pct_true")
+
+ggplot(flags_summary, aes(x = flag, y = pct_true, fill = is_fraud)) +
+  geom_col(position = "dodge") +
+  labs(title = "Behavioral Red Flags by Fraud Status",
+       x = "Flag", y = "% of Transactions = TRUE") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(df, aes(x = amount_usd, fill = is_fraud)) +
+  geom_histogram(alpha = 0.6, position = "identity", bins = 50) +
+  labs(title = "Transaction Amount Distribution: Fraud vs Not Fraud",
+       x = "Amount (USD)", y = "Count") +
+  theme_minimal()
+
+ggplot(df, aes(x = amount_usd, fill = is_fraud)) +
+  geom_histogram(alpha = 0.6, position = "identity", bins = 50) +
+  scale_x_log10() +
+  labs(title = "Transaction Amount Distribution (log scale)",
+       x = "Amount (USD, log scale)", y = "Count") +
+  theme_minimal()
+
+ggplot(df, aes(x = velocity_score, y = merchant_risk_score, color = is_fraud)) +
+  geom_point(alpha = 0.5) +
+  labs(title = "Velocity Score vs Merchant Risk Score",
+       x = "Velocity Score", y = "Merchant Risk Score") +
+  theme_minimal()
